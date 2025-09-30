@@ -9,6 +9,7 @@ type User struct {
 	Name      string    `gorm:"size:100;not null" json:"name"`
 	Email     string    `gorm:"size:100;uniqueIndex;not null" json:"email"`
 	Password  string    `gorm:"size:255;not null" json:"-"`
+	Events    []Event   `gorm:"foreignKey:UserID" json:"events"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

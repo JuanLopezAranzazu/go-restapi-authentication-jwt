@@ -15,7 +15,7 @@ func main() {
 	// conexion con la base de datos
 	db.DBConnection()
 	// migraciones de las tablas
-	if err := db.DB.AutoMigrate(models.User{}); err != nil {
+	if err := db.DB.AutoMigrate(models.User{}, models.Event{}); err != nil {
 		log.Fatal("Error en migración de tablas: ", err)
 	}
 	// manejar rutas
@@ -29,8 +29,13 @@ func main() {
 	s.HandleFunc("/auth/login", routes.LoginHandler).Methods("POST")
 	s.HandleFunc("/auth/register", routes.RegisterHandler).Methods("POST")
 	s.HandleFunc("/auth/refresh", routes.RefreshHandler).Methods("POST")
-
 	s.Handle("/auth/me", middlewares.JWTMiddleware(http.HandlerFunc(routes.MeHandler))).Methods("GET")
+	// eventos del usuario
+	s.Handle("/events", middlewares.JWTMiddleware(http.HandlerFunc(routes.CreateEventHandler))).Methods("POST")
+	s.Handle("/events", middlewares.JWTMiddleware(http.HandlerFunc(routes.GetMyEventsHandler))).Methods("GET")
+	s.Handle("/events/{id}", middlewares.JWTMiddleware(http.HandlerFunc(routes.GetEventHandler))).Methods("GET")
+	s.Handle("/events/{id}", middlewares.JWTMiddleware(http.HandlerFunc(routes.UpdateEventHandler))).Methods("PUT")
+	s.Handle("/events/{id}", middlewares.JWTMiddleware(http.HandlerFunc(routes.DeleteEventHandler))).Methods("DELETE")
 
 	// iniciar servidor
 	log.Println("Servidor iniciado en http://localhost:3000")
